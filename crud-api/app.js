@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const port = 3000;
 
-const tasks = [ {id: 0,
+let tasks = [ {id: 0,
                 title: "Finish Task 1",
                 done: false},
                 {id: 1,
@@ -47,6 +47,56 @@ app.post('/tasks', (req, res) => {
     newTask.done = false;
     tasks.push(newTask);
     res.status(201).send(newTask);
+});
+
+app.put('/tasks/:id', (req, res) => {
+    let target = null;
+    const id = Number(req.params.id);
+    tasks.forEach((task) => {
+        if(task.id == id)
+            target = task;
+    });
+
+    if(target == null)
+        return res.status(404).send({error: `Task ${id} not found`});
+
+    if(Object.keys(req.body).includes("title")){
+        if(req.body.title == "")
+            return res.status(400).send({error: "Empty title"});
+        else
+            target.title = req.body.title;
+    }
+
+    if(Object.keys(req.body).includes("done")){
+        if(req.body.done != true && req.body.done != false)
+            return res.status(400).send({error: "Invalid done"});
+        else
+            target.done = req.body.done;
+    }
+
+    return res.json(target);
+});
+
+app.delete('/tasks/:id', (req, res) => {
+    let target = null;
+    const newTasks = [];
+    const id = Number(req.params.id);
+    tasks.forEach((task) => {
+        if(task.id == id)
+            target = task;
+    });
+
+    if(target == null)
+        return res.status(404).send({error: `Task ${id} not found`});
+    else
+        tasks.forEach((task) => {
+            if(task.id != id)
+                newTasks.push(task);
+        });
+    
+    tasks = newTasks;
+
+    return res.sendStatus(204);
 });
 
 app.listen(port, () => {
