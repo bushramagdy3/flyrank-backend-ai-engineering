@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 const port = 3000;
+const openAPIDoc = require('./openapi.json');
+const swaggerUI = require("swagger-ui-express");
 
 let tasks = [ {id: 0,
                 title: "Finish Task 1",
@@ -13,6 +15,8 @@ let tasks = [ {id: 0,
                 done: false} ];
 
 app.use(express.json());
+
+app.use('/docs', swaggerUI.serve, swaggerUI.setup(openAPIDoc));
 
 app.get('/', (req, res) => {
     res.json({ name: "Task API", version: "1.0", endpoints: ["/tasks"] });

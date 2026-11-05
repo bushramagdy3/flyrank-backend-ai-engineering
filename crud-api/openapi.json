@@ -1,0 +1,90 @@
+{   "openapi": "3.0.3",
+    "info": {
+        "title": "Tasl API",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "returns API information"
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "returns the API health status"
+                    }
+                }
+            }
+        },
+        "/tasks": {
+            "get" : {
+                "responses" : {
+                    "200": {
+                        "description" : "returns an array of task objects"
+                    }
+                }
+            },
+            "post": {
+                "responses": {
+                    "201": {
+                        "description": "creates and returns a task object"
+                    },
+                    "400": {
+                        "description": "missing title"
+                    }
+                }
+            }
+        },
+        "/tasks/{id}": {
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer"
+                    }
+                }
+            ],
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "returns a task object"
+                    },
+                    "404": {
+                        "description": "task not found"
+                    }
+                }
+            },
+            "put": {
+                "responses": {
+                    "200": {
+                        "description": "updates and returns a task object"
+                    },
+                    "400": {
+                        "description": "empty title or invalid done value"
+                    },
+                    "404": {
+                        "description": "task not found"
+                    }
+                }
+            },
+            "delete": {
+                "responses": {
+                    "204": {
+                        "description": "deletes a task"
+                    },
+                    "404": {
+                        "description": "task not found"
+                    }
+                }
+            }
+        }
+    }
+}
