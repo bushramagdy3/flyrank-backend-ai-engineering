@@ -31,12 +31,29 @@
                 }
             },
             "post": {
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["title"],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "minLength": 1
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "201": {
                         "description": "creates and returns a task object"
                     },
                     "400": {
-                        "description": "missing title"
+                        "description": "missing or invalid title"
                     }
                 }
             }
@@ -63,12 +80,35 @@
                 }
             },
             "put": {
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "anyOf": [
+                                    {"required": ["title"]},
+                                    {"required": ["done"]}
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "minLength": 1
+                                    },
+                                    "done": {
+                                        "type": "boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "updates and returns a task object"
                     },
                     "400": {
-                        "description": "empty title or invalid done value"
+                        "description": "empty body, missing title or done, or invalid field value"
                     },
                     "404": {
                         "description": "task not found"

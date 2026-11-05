@@ -44,9 +44,10 @@ app.get('/tasks/:id', (req, res) => {
 });
 
 app.post('/tasks', (req, res) => {
-    if(!Object.keys(req.body).includes("title") || req.body.title == "")
-        res.status(400).json({error: "Missing title"});
-    newTask = {id: tasks.length};
+    if(!req.body || typeof req.body.title !== "string" || req.body.title === ""){
+        return res.status(400).json({error: "Missing title"});
+    }
+    const newTask = {id: tasks.length};
     newTask.title = req.body.title;
     newTask.done = false;
     tasks.push(newTask);
@@ -54,6 +55,21 @@ app.post('/tasks', (req, res) => {
 });
 
 app.put('/tasks/:id', (req, res) => {
+    if(!req.body || typeof req.body !== "object" || Array.isArray(req.body))
+        return res.status(400).send({error: "Invalid task body"});
+
+    const hasTitle = Object.hasOwn(req.body, "title");
+    const hasDone = Object.hasOwn(req.body, "done");
+
+    if(!hasTitle && !hasDone)
+        return res.status(400).send({error: "Missing title or done"});
+
+    if(hasTitle && (typeof req.body.title !== "string" || req.body.title === ""))
+        return res.status(400).send({error: "Invalid title"});
+
+    if(hasDone && typeof req.body.done !== "boolean")
+        return res.status(400).send({error: "Invalid done"});
+
     let target = null;
     const id = Number(req.params.id);
     tasks.forEach((task) => {
@@ -64,19 +80,11 @@ app.put('/tasks/:id', (req, res) => {
     if(target == null)
         return res.status(404).send({error: `Task ${id} not found`});
 
-    if(Object.keys(req.body).includes("title")){
-        if(req.body.title == "")
-            return res.status(400).send({error: "Empty title"});
-        else
-            target.title = req.body.title;
-    }
+    if(hasTitle)
+        target.title = req.body.title;
 
-    if(Object.keys(req.body).includes("done")){
-        if(req.body.done != true && req.body.done != false)
-            return res.status(400).send({error: "Invalid done"});
-        else
-            target.done = req.body.done;
-    }
+    if(hasDone)
+        target.done = req.body.done;
 
     return res.json(target);
 });
