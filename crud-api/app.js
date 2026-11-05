@@ -12,6 +12,8 @@ const tasks = [ {id: 0,
                 title: "Finish Task 3",
                 done: false} ];
 
+app.use(express.json());
+
 app.get('/', (req, res) => {
     res.json({ name: "Task API", version: "1.0", endpoints: ["/tasks"] });
 });
@@ -35,6 +37,16 @@ app.get('/tasks/:id', (req, res) => {
     });
     if(!found)
         res.status(404).json({error: `Task ${id} not found`});
+});
+
+app.post('/tasks', (req, res) => {
+    if(!Object.keys(req.body).includes("title") || req.body.title == "")
+        res.status(400).json({error: "Missing title"});
+    newTask = {id: tasks.length};
+    newTask.title = req.body.title;
+    newTask.done = false;
+    tasks.push(newTask);
+    res.status(201).send(newTask);
 });
 
 app.listen(port, () => {
