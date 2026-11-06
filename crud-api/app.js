@@ -3,16 +3,31 @@ const app = express();
 const port = 3000;
 const openAPIDoc = require('./openapi.json');
 const swaggerUI = require("swagger-ui-express");
+const Database = require("better-sqlite3");
 
-let tasks = [ {id: 0,
-                title: "Finish Task 1",
-                done: false},
-                {id: 1,
-                title: "Finish Task 2",
-                done: false},
-                {id: 2,
-                title: "Finish Task 3",
-                done: false} ];
+const db = new Database("./tasks.db");
+
+const initialize = db.prepare(`
+        CREATE TABLE IF NOT EXISTS tasks(
+            id INTEGER PRIMARY KEY,
+            title TEXT NOT NULL,
+            done INTEGER NOT NULL DEFAULT 0 CHECK (done IN (0,1))
+        );
+    `);
+
+initialize.run();
+
+const isEmptyCheck = db.prepare(`
+        SELECT * FROM tasks;
+    `);
+const results = isEmptyCheck.all();
+
+if(results.length == 0){
+    const insertItems = db.prepare(`
+            INSERT INTO tasks (title, done) VALUES ('1st Task', 0), ('2nd Task' , 1);
+        `);
+    insertItems.run();
+}
 
 app.use(express.json());
 
