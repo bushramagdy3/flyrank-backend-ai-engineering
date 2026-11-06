@@ -42,20 +42,20 @@ app.get('/health', (req, res) => {
 });
 
 app.get('/tasks', (req, res) => {
+    const query = db.prepare(`SELECT * FROM tasks`);
+    tasks = query.all();
     res.json(tasks);
 });
 
 app.get('/tasks/:id', (req, res) => {
     id = Number(req.params.id);
-    let found = false;
-    tasks.forEach((task) => {
-        if(task.id == id){
-            res.json(task);
-            found = true;
-        }
-    });
-    if(!found)
-        res.status(404).json({error: `Task ${id} not found`});
+    query = db.prepare(`SELECT * FROM tasks WHERE id = ?`)
+    task = query.get(id);
+
+    if(!task)
+        return res.status(404).json({error: `Task ${id} not found`});
+
+    return res.json(task);
 });
 
 app.post('/tasks', (req, res) => {
