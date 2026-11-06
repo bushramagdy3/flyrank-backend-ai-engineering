@@ -9,18 +9,16 @@ Requires Node.js 22 or newer and npm. From the **repository root** (the folder c
 Command Prompt, PowerShell 7+, or Bash:
 
 ```sh
-npm ci --ignore-scripts && npm start
+npm ci && npm start
 ```
 
 Windows PowerShell 5.1:
 
 ```powershell
-npm.cmd ci --ignore-scripts; if ($LASTEXITCODE -eq 0) { npm.cmd start }
+npm.cmd ci; if ($LASTEXITCODE -eq 0) { npm.cmd start }
 ```
 
 On Windows, use `npm.cmd` in place of `npm` if PowerShell blocks `npm.ps1`.
-
-The install command skips lifecycle scripts and uses the [SQLite binaries bundled with `better-sqlite3`](https://github.com/WiseLibs/better-sqlite3/releases/tag/v13.0.0), avoiding an unnecessary native build on supported platforms.
 
 The API runs at <http://localhost:3000>. Open <http://localhost:3000/docs/> for Swagger UI.
 
