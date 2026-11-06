@@ -24,7 +24,7 @@ const results = isEmptyCheck.all();
 
 if(results.length == 0){
     const insertItems = db.prepare(`
-            INSERT INTO tasks (title, done) VALUES ('1st Task', 0), ('2nd Task' , 1);
+            INSERT INTO tasks (title, done) VALUES ('1st Task', 0), ('2nd Task' , 1), ('3rd Task', 0);
         `);
     insertItems.run();
 }
