@@ -75,6 +75,7 @@ app.put('/tasks/:id', (req, res) => {
     if(!req.body || typeof req.body !== "object" || Array.isArray(req.body))
         return res.status(400).send({error: "Invalid task body"});
 
+    const id = Number(req.params.id);
     const hasTitle = Object.hasOwn(req.body, "title");
     const hasDone = Object.hasOwn(req.body, "done");
 
@@ -87,43 +88,28 @@ app.put('/tasks/:id', (req, res) => {
     if(hasDone && typeof req.body.done !== "boolean")
         return res.status(400).send({error: "Invalid done"});
 
-    let target = null;
-    const id = Number(req.params.id);
-    tasks.forEach((task) => {
-        if(task.id == id)
-            target = task;
-    });
+    let target = db.prepare(`SELECT * FROM tasks WHERE id = ?`).get(id);
 
     if(target == null)
         return res.status(404).send({error: `Task ${id} not found`});
 
     if(hasTitle)
-        target.title = req.body.title;
+        db.prepare(`UPDATE tasks SET title = ? WHERE id = ?;`).run(req.body.title, id);
 
     if(hasDone)
-        target.done = req.body.done;
+        db.prepare(`UPDATE tasks SET done = ? WHERE id = ?;`).run(req.body.done ? 1 : 0, id);
 
-    return res.json(target);
+    return res.json(db.prepare(`SELECT * FROM tasks WHERE id = ?`).get(id));
 });
 
 app.delete('/tasks/:id', (req, res) => {
-    let target = null;
-    const newTasks = [];
     const id = Number(req.params.id);
-    tasks.forEach((task) => {
-        if(task.id == id)
-            target = task;
-    });
+    const target = db.prepare(`SELECT * FROM tasks WHERE id = ?`).get(id);
 
     if(target == null)
         return res.status(404).send({error: `Task ${id} not found`});
-    else
-        tasks.forEach((task) => {
-            if(task.id != id)
-                newTasks.push(task);
-        });
     
-    tasks = newTasks;
+    db.prepare(`DELETE FROM tasks WHERE id = ?`).run(id);
 
     return res.sendStatus(204);
 });
