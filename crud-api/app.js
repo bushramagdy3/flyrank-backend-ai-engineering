@@ -62,10 +62,12 @@ app.post('/tasks', (req, res) => {
     if(!req.body || typeof req.body.title !== "string" || req.body.title === ""){
         return res.status(400).json({error: "Missing title"});
     }
-    const newTask = {id: tasks.length};
-    newTask.title = req.body.title;
-    newTask.done = false;
-    tasks.push(newTask);
+
+    const query = db.prepare(`INSERT INTO tasks (title) VALUES (?);`);
+    runRes = query.run(req.body.title);
+
+    newTask = db.prepare(`SELECT * FROM tasks WHERE id = ?`).get(runRes.lastInsertRowid);
+
     res.status(201).send(newTask);
 });
 
