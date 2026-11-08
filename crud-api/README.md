@@ -2,6 +2,8 @@
 
 A simple Express API for creating, reading, updating, and deleting tasks. Tasks are stored in SQLite and survive server restarts.
 
+The code is split into routes, services, repositories, and database setup.
+
 ## Install and run
 
 Requires Node.js 22 or newer and npm. From the **repository root** (the folder containing `package.json`), install dependencies and start the project with one command.
@@ -22,6 +24,44 @@ On Windows, use `npm.cmd` in place of `npm` if PowerShell blocks `npm.ps1`.
 
 The API runs at <http://localhost:3000>. Open <http://localhost:3000/docs/> for Swagger UI.
 
+## Project structure
+
+```text
+crud-api/
+    app.js
+    db/
+        database.js
+    routes/
+        taskRoutes.js
+    services/
+        taskService.js
+    repositories/
+        taskRepository.js
+    openapi.json
+    tasks.db
+```
+
+`tasks.db` is created automatically when the app starts.
+
+| File | Responsibility |
+| --- | --- |
+| [app.js](app.js) | Sets up Express, starts the database, mounts the task routes and Swagger UI, and handles `/` and `/health`. |
+| [routes/taskRoutes.js](routes/taskRoutes.js) | Maps each task route to its corresponding service function: `getTasks`, `getTask`, `createTask`, `updateTask`, or `deleteTask`. |
+| [services/taskService.js](services/taskService.js) | Validates requests, calls repository functions, and sends responses with the appropriate status codes. |
+| [repositories/taskRepository.js](repositories/taskRepository.js) | Runs task queries using `db.prepare()` with `.all()`, `.get()`, and `.run()`. Exports `getAllTasks`, `getTaskById`, `insertTask`, `updateTaskTitle`, `updateTaskDone`, and `removeTask`. |
+| [db/database.js](db/database.js) | Opens the SQLite connection and exports `db` and `startDatabase` for table creation and initial seed data. |
+| [openapi.json](openapi.json) | Describes the API endpoints for Swagger UI. |
+
+Task requests follow this flow:
+
+```text
+Request -> taskRoutes.js -> taskService.js -> taskRepository.js -> SQLite
+```
+
+For example, `GET /tasks` calls `getTasks` in the service, which calls `getAllTasks` in the repository. The repository runs the SQL query and returns the tasks, and the service sends them as JSON.
+
+The service and repository export their functions with `module.exports = {...}` and import them using destructured `require()`. The database module uses the same pattern. The routes file exports the Express router with `module.exports = router`.
+
 ## Why SQLite?
 
 SQLite keeps the database in a single file, needs no separate database server or manual setup, and saves tasks across app restarts. It fits this small task API while supporting SQL queries and constraints.
@@ -32,7 +72,7 @@ The database lives at **`crud-api/tasks.db`**. It is created automatically when 
 
 `npm start` runs the app from `crud-api`, keeping the database in that folder. No database file, table, or seed data needs to be created manually.
 
-At startup, the app creates the `tasks` table if it does not exist:
+At startup, `app.js` calls `startDatabase()` from `db/database.js` to create the `tasks` table if it does not exist:
 
 | Column | Definition |
 | --- | --- |
