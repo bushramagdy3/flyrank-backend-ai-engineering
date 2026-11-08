@@ -6,13 +6,13 @@ const {getAllTasks,
        removeTask} = require("../repositories/taskRepository.js");
 
 const getTasks = (req, res) => {
-    tasks = getAllTasks();
+    const tasks = getAllTasks();
     res.json(tasks);
 };
 
 const getTask = (req, res) => {
-    id = Number(req.params.id);
-    task = getTaskById(id);
+    const id = Number(req.params.id);
+    const task = getTaskById(id);
 
     if(!task)
         return res.status(404).json({error: `Task ${id} not found`});
@@ -25,9 +25,9 @@ const createTask = (req, res) => {
         return res.status(400).json({error: "Missing title"});
     }
 
-    runRes = insertTask(req.body.title);
+    const runRes = insertTask(req.body.title);
 
-    newTask = getTaskById(runRes.lastInsertRowid);
+    const newTask = getTaskById(runRes.lastInsertRowid);
 
     res.status(201).send(newTask);
 };
@@ -49,7 +49,7 @@ const updateTask = (req, res) => {
     if(hasDone && typeof req.body.done !== "boolean")
         return res.status(400).send({error: "Invalid done"});
 
-    let target = getTaskById(id);
+    const target = getTaskById(id);
 
     if(target == null)
         return res.status(404).send({error: `Task ${id} not found`});
