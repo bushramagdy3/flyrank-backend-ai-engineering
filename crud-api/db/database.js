@@ -1,6 +1,6 @@
 const Database = require("better-sqlite3");
 
-const db = new Database("./tasks.db");
+const db = new Database("./db/tasks.db");
 
 function startDatabase(){
     db.prepare(`
